@@ -1,0 +1,10 @@
+FROM apache/spark-py:v3.2.1
+
+USER root
+
+RUN pip3 install delta-spark delta-sharing
+RUN pip3 install pytz
+
+COPY scripts /opt/spark/work-dir
+
+ENV SPARK_HOME /opt/spark

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pipelines
+imagePullSecrets:
+  - name: docker-registry
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pipelines-role
+rules:
+  - apiGroups: ['']
+    resources: ['pods', 'services', 'configmaps', 'persistentvolumeclaims']
+    verbs: ['create', 'get', 'watch', 'list', 'post', 'delete']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pipelines-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: pipelines
+roleRef:
+  kind: Role
+  name: pipelines-role
+  apiGroup: rbac.authorization.k8s.io

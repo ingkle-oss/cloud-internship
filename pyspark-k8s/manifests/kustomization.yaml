@@ -1,0 +1,5 @@
+namespace: pipelines
+
+resources:
+  - ./pipelines-namespace.yaml
+  - ./pipelines-rbac.yaml
