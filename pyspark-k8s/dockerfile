@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y maven
 COPY ${POMFILE} /opt
 
 RUN mvn -f /opt/${POMFILE} dependency:copy-dependencies -DoutputDirectory=/opt/packages
+COPY /opt/packages/* /opt/spark/jars
 
 RUN pip3 install delta-spark==1.2.0 delta-sharing
 RUN pip3 install pytz
