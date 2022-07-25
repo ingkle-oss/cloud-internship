@@ -2,6 +2,14 @@ FROM apache/spark-py:v3.2.1
 
 USER root
 
+ARG POMFILE=delta-pom.xml
+
+RUN apt-get update && apt-get install -y maven
+
+COPY ${POMFILE} /opt
+
+RUN mvn -f /opt/${POMFILE} dependency:copy-dependencies -DoutputDirectory=/opt/packages
+
 RUN pip3 install delta-spark delta-sharing
 RUN pip3 install pytz
 
