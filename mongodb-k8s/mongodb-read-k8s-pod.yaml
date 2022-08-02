@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mongodb-read-k8s-pod
+spec:
+  containers:
+  - name: mongodb-read-k8s
+    image: jm3015/mongodb-py
+    # resources:
+    #   requests:
+    #     memory: "1Gi"
+    #     cpu: 1
+    #   limits:
+    #     memory: "2Gi"
+    #     cpu: 1
+    env:
+    - name: MONGODB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: mongodb-user-pass
+          key: username
+    - name: MONGODB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mongodb-user-pass
+          key: password
+    command: ['python']
+    args: [$SCRIPT, $(MONGODB_USERNAME), $(MONGODB_PASSWORD)]
+  restartPolicy: Never

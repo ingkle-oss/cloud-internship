@@ -1,0 +1,10 @@
+FROM python:3.9.13
+
+USER root
+
+RUN apt-get update
+
+RUN pip3 install pymongo smart_open
+RUN pip3 install boto3
+
+COPY scripts /opt/work-dir
