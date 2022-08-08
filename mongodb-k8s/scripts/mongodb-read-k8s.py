@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-from smart_open import open
 import sys, time
 
 if len(sys.argv) < 3:
@@ -24,9 +23,9 @@ collection = db.get_collection(coll)
 print("start...")
 start = time.time()
 
-documents = collection.find()
-for doc in documents:
-    print(doc)
+cursor = collection.find()
+for doc in cursor:
+    pass
     
 end = time.time()
 print('Complete, Time elapsed: ', end-start)

@@ -10,7 +10,7 @@ if len(sys.argv) < 3:
     print(f"Usage: {sys.argv[0]} <access_key> <secret_key>")
     exit(1)
 
-endpoint = '10.0.0.155:9000'
+endpoint = 'minio.minio.svc.cluster.local'
 
 def load_config(spark_context: SparkContext):
     spark_context._jsc.hadoopConfiguration().set('fs.s3a.access.key', sys.argv[1])
@@ -33,9 +33,13 @@ load_config(spark.sparkContext)
 # %%
 print('Read delta...')
 start = time.time()
+
 df = spark.read \
     .format("delta") \
     .load('s3a://delta/test')
+for d in df:
+    pass
+
 end = time.time()
 print('Read Complete, Time elapsed: ', end-start)
 

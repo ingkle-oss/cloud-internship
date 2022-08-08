@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: elasticsearch-write-k8s-pod
+spec:
+  containers:
+  - name: elasticsearch-write-k8s
+    image: jm3015/elasticsearch-py
+    env:
+    - name: MINIO_ACCESSKEY
+      valueFrom:
+        secretKeyRef:
+          name: minio-access-secret
+          key: accesskey
+    - name: MINIO_SECRETKEY
+      valueFrom:
+        secretKeyRef:
+          name: minio-access-secret
+          key: secretkey
+    - name: ELASTICSEARCH_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-user-pass
+          key: username
+    - name: ELASTICSEARCH_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-user-pass
+          key: password
+    command: ['python']
+    args: [$SCRIPT, $(MINIO_ACCESSKEY), $(MINIO_SECRETKEY), $(ELASTICSEARCH_USERNAME), $(ELASTICSEARCH_PASSWORD)]
+  restartPolicy: Never
