@@ -6,7 +6,7 @@
 ./elasticsearch-write-k8s.sh /opt/work-dir/elasticsearch-write-csv-k8s.py
 ```
 
-## Load data from MongoDB
+## Load data from Elasticsearch
 
 ```
 ./elasticsearch-read-k8s.sh /opt/work-dir/elasticsearch-read-k8s.py
