@@ -28,6 +28,6 @@ for doc in cursor:
     pass
     
 end = time.time()
-print('Complete, Time elapsed: ', end-start)
+print('Complete, Time elapsed(s): ', end-start)
 
 conn.close()

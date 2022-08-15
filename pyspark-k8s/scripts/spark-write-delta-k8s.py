@@ -1,11 +1,8 @@
-# %%
-import sys
 from pyspark.sql import SparkSession
 from pyspark.context import SparkContext
 from delta import *
-import time
+import time, sys
 
-# %%
 if len(sys.argv) < 3:
     print(f"Usage: {sys.argv[0]} <access_key> <secret_key>")
     exit(1)
@@ -21,7 +18,6 @@ def load_config(spark_context: SparkContext):
     spark_context._jsc.hadoopConfiguration().set('fs.s3a.connection.ssl.enabled', 'false')
     spark_context._jsc.hadoopConfiguration().set('fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider')
 
-# %%
 builder = SparkSession.builder \
     .master("local") \
     .appName("MyTest") \
@@ -30,19 +26,20 @@ builder = SparkSession.builder \
 spark = configure_spark_with_delta_pip(builder).getOrCreate()
 load_config(spark.sparkContext)
 
-# %%
-print('Read delta...')
+print('Loading csv...')
 start = time.time()
 
-df = spark.read \
-    .format("delta") \
-    .load('s3a://delta/test')
-for d in df:
-    pass
+df = spark.read.options(header=True, inferSchema=True) \
+    .format("csv") \
+    .load('s3a://test/test.csv')
+    
+end = time.time()
+print('Load Complete, Time elapsed: ', end-start)
+
+print('Writing delta...')
+start = time.time()
+
+df.write.format('delta').mode("overwrite").option("overwriteSchema", "True").save('s3a://delta/test')
 
 end = time.time()
-print('Read Complete, Time elapsed: ', end-start)
-
-df.show()
-
-
+print('Write Complete, Time elapsed(s): ', end - start)

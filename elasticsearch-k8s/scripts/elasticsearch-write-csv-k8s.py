@@ -58,4 +58,4 @@ else:
                 helpers.bulk(es, data, index="mytest")
     
     end = time.time()
-    print('Complete, Time elapsed: ', end-start)
+    print('Complete, Time elapsed(s): ', end-start)

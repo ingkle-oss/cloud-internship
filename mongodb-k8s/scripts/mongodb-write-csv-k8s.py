@@ -62,4 +62,4 @@ with open(f's3://{bucket_name}/{file_name}', 'rb', encoding='utf-8', transport_p
 
 end = time.time()
 
-print('Complete, Time elapsed: ', end-start)
+print('Complete, Time elapsed(s): ', end-start)
