@@ -1,0 +1,15 @@
+FROM openjdk:8-jdk
+
+USER root
+
+ARG POMFILE=pom.xml
+ARG SOURCES=src
+
+RUN apt-get update && apt-get install -y maven
+
+WORKDIR /usr/src/work-dir
+COPY ${SOURCES} ./src
+COPY ${POMFILE} ./
+RUN mvn package
+
+WORKDIR /usr/src/work-dir/target/

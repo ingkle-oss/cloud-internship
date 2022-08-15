@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: deltastandalone-read-k8s-pod
+spec:
+  containers:
+  - name: deltastandalone-read-k8s
+    image: jm3015/deltastandalone
+    env:
+    - name: MINIO_ACCESSKEY
+      valueFrom:
+        secretKeyRef:
+          name: minio-access-secret
+          key: accesskey
+    - name: MINIO_SECRETKEY
+      valueFrom:
+        secretKeyRef:
+          name: minio-access-secret
+          key: secretkey
+    command: ['java']
+    args: ["-jar", "deltaStandalone-1.0.jar", $(MINIO_ACCESSKEY), $(MINIO_SECRETKEY)]
+  restartPolicy: Never
