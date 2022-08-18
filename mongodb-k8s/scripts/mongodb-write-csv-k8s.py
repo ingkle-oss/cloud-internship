@@ -35,6 +35,7 @@ db = conn.get_database(database)
 collection = db.get_collection(coll)
 db.drop_collection(collection)
 
+total_time = 0
 start = time.time()
 print("start...")
 
@@ -58,8 +59,9 @@ with open(f's3://{bucket_name}/{file_name}', 'rb', encoding='utf-8', transport_p
             data.append(dict(zip(header, row.split(','))))
         
         if data != []:
+            start = time.time()
             collection.insert_many(data)
+            end = time.time()
+            total_time = total_time + (end - start)
 
-end = time.time()
-
-print('Complete, Time elapsed(s): ', end-start)
+print('Complete, Time elapsed(s): ', total_time)

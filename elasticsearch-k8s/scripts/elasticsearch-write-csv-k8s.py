@@ -23,39 +23,43 @@ username = sys.argv[3]
 password = sys.argv[4]
 
 es = Elasticsearch(hosts=[f'http://{username}:{password}@{host}:{port}'])
+target_index = 'mytest'
 
-# Write csv to Elasticsearch
-
-if es.indices.exists(index="mytest"):
+if es.indices.exists(index=target_index):
     print("index already exists")
-else:
-    es.indices.create(index="mytest")
-    
-    # write csv to Elasticsearch
-    print('start...')
-    start = time.time()
+    es.indices.delete(index=target_index)
+    print(f"index \'{target_index}\' is deleted")
 
-    with open(f's3://{bucket_name}/{file_name}', 'rb', encoding='utf-8', transport_params={'client':client}) as fin:
-        header = fin.readline().rstrip().split(',')
+es.indices.create(index=target_index)
+print(f'index \'{target_index}\' is created')
+
+# write csv to Elasticsearch
+total_time = 0
+print('start...')
+
+with open(f's3://{bucket_name}/{file_name}', 'rb', encoding='utf-8', transport_params={'client':client}) as fin:
+    header = fin.readline().rstrip().split(',')
+
+    row = None
+    while True:
+        if row == '':
+            break
     
-        row = None
-        while True:
+        data = []
+    
+        # Read 10000 rows and write
+        for _ in range(10000):
+            row = fin.readline().rstrip()
+        
             if row == '':
                 break
-        
-            data = []
-        
-            # Read 10000 rows and write
-            for _ in range(10000):
-                row = fin.readline().rstrip()
-            
-                if row == '':
-                    break
 
-                data.append(dict(zip(header, row.split(','))))
-        
-            if data != []:
-                helpers.bulk(es, data, index="mytest")
+            data.append(dict(zip(header, row.split(','))))
     
-    end = time.time()
-    print('Complete, Time elapsed(s): ', end-start)
+        if data != []:
+            start = time.time()
+            helpers.bulk(es, data, index=target_index)
+            end = time.time()
+            total_time = total_time + (end - start)
+
+print('Complete, Time elapsed(s): ', total_time)

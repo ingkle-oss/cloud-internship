@@ -27,15 +27,17 @@ builder = SparkSession.builder \
 spark = configure_spark_with_delta_pip(builder).getOrCreate()
 load_config(spark.sparkContext)
 
-print('Read delta...')
-start = time.time()
-
 df = spark.read \
     .format("delta") \
     .load('s3a://delta/test')
-    
-for d in df:
-    pass
+
+print('Read delta...')
+start = time.time()
+
+df.collect()
 
 end = time.time()
 print('Read Complete, Time elapsed(s): ', end-start)
+
+df.printSchema()
+df.describe().show(vertical=True)

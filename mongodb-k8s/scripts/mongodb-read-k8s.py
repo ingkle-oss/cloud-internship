@@ -20,10 +20,11 @@ conn = MongoClient(CONNECTION_STRING)
 db = conn.get_database(database)
 collection = db.get_collection(coll)
 
+cursor = collection.find()
 print("start...")
+
 start = time.time()
 
-cursor = collection.find()
 for doc in cursor:
     pass
     

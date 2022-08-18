@@ -13,6 +13,7 @@ RUN cp /opt/packages/* /opt/spark/jars
 
 RUN pip3 install delta-spark==1.2.0 delta-sharing
 RUN pip3 install pytz
+RUN pip3 install smart_open boto3
 
 COPY scripts /opt/spark/work-dir
 

@@ -39,7 +39,7 @@ print('Load Complete, Time elapsed: ', end-start)
 print('Writing delta...')
 start = time.time()
 
-df.write.format('delta').mode("overwrite").option("overwriteSchema", "True").save('s3a://delta/test')
+df.write.format('delta').mode("overwrite").option("overwriteSchema", "True").save('s3a://delta/loadsavetest/')
 
 end = time.time()
 print('Write Complete, Time elapsed(s): ', end - start)
