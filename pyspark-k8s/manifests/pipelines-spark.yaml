@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipelines-spark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipelines-spark
+  template:
+    metadata:
+      labels:
+        app: pipelines-spark
+    spec:
+      serviceAccountName: pipelines
+      containers:
+        - name: pipelines-spark
+          image: jm3015/spark-py
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4040
+              protocol: TCP
+            - containerPort: 10000
+              protocol: TCP
+            - containerPort: 10047
+              protocol: TCP
+            - containerPort: 10083
+              protocol: TCP
+          command:
+            - /opt/spark/bin/spark-submit
+          env:
+            - name: S3ACCESSKEY
+              valueFrom:
+                secretKeyRef:
+                  name: pipelines-secret
+                  key: accesskey
+            - name: S3SECRETKEY
+              valueFrom:
+                secretKeyRef:
+                  name: pipelines-secret
+                  key: secretkey
+          args:
+            - --master
+            - k8s://https://kubernetes.default.svc.cluster.local
+            - --deploy-mode
+            - client
+            - --driver-memory
+            - 2g
+            - --executor-memory
+            - 4g
+            - --conf
+            - spark.executor.instances=1
+            - --conf
+            - spark.driver.bindAddress=0.0.0.0
+            - --conf
+            - spark.driver.port=10047
+            - --conf
+            - spark.driver.host=pipelines-spark.pipelines.svc.cluster.local
+            - --conf
+            - spark.driver.blockManager.port=10083
+            - --conf
+            - spark.kubernetes.namespace=pipelines
+            - --conf
+            - spark.kubernetes.authenticate.driver.serviceAccountName=pipelines
+            - --conf
+            - spark.kubernetes.executor.label.spark-exec-name=spark
+            - --conf
+            - spark.kubernetes.container.image=jm3015/spark-py
+            - --conf
+            - spark.kubernetes.container.image.pullPolicy=Always
+            - --name
+            - pipelines-spark
+            - local:///opt/spark/work-dir/pipelines.py
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pipelines-spark
+  labels:
+    app: pipelines-spark
+spec:
+  ports:
+    - port: 4040
+      protocol: TCP
+      name: spark-ui
+    - port: 10000
+      protocol: TCP
+      name: spark-thrift
+    - port: 10047
+      protocol: TCP
+      name: spark-driver
+    - port: 10083
+      protocol: TCP
+      name: spark-blockmanager
+  selector:
+    app: pipelines-spark
