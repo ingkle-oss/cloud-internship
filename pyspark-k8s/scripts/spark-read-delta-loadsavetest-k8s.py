@@ -20,8 +20,6 @@ def load_config(spark_context: SparkContext):
     spark_context._jsc.hadoopConfiguration().set('fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider')
 
 builder = SparkSession.builder \
-    .master("local") \
-    .appName("MyTest") \
     .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
     .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
 spark = configure_spark_with_delta_pip(builder).getOrCreate()
@@ -30,14 +28,15 @@ load_config(spark.sparkContext)
 df = spark.read \
     .format("delta") \
     .load('s3a://delta/loadsavetest')
+    
+def f(row):
+    pass
 
 print('Read delta...')
 start = time.time()
 
-df.collect()
+#df.collect()
+df.foreach(f)
 
 end = time.time()
 print('Read Complete, Time elapsed(s): ', end-start)
-
-df.printSchema()
-df.describe().show(vertical=True)

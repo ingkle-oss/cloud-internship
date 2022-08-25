@@ -3,4 +3,4 @@ namespace: pipelines
 resources:
   - ./pipelines-namespace.yaml
   - ./pipelines-rbac.yaml
-  - ./pipelines-spark.yaml
+#  - ./pipelines-spark.yaml

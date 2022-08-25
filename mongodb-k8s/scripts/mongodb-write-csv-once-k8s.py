@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from smart_open import open
 import boto3
-import sys, time
+import sys, time, csv
 
 if len(sys.argv) < 5:
     print(f"Usage: {sys.argv[0]} <Minio access key> <Minio secret key> <MongoDB username> <MongoDB password>")
@@ -39,28 +39,12 @@ total_time = 0
 print("start...")
 
 with open(f's3://{bucket_name}/{file_name}', 'rb', encoding='utf-8', transport_params={'client':client}) as fin:
-    header = fin.readline().rstrip().split(',')
+    data = csv.DictReader(fin)
     
-    row = None
-    while True:
-        if row == '':
-            break
-        
-        data = []
-        
-        # Read 10000 rows and write
-        for _ in range(10000):
-            row = fin.readline().rstrip()
-            
-            if row == '':
-                break
-
-            data.append(dict(zip(header, row.split(','))))
-        
-        if data != []:
-            start = time.time()
-            collection.insert_many(data)
-            end = time.time()
-            total_time = total_time + (end - start)
+    start = time.time()
+    collection.insert_many(data)
+    end = time.time()
+    
+    total_time = total_time + (end - start)
 
 print('Complete, Time elapsed(s): ', total_time)

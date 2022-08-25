@@ -1,7 +1,7 @@
 from elasticsearch import helpers, Elasticsearch
 from smart_open import open
 import boto3
-import sys, time
+import sys, time, csv
 
 # Minio Config
 
@@ -38,28 +38,12 @@ total_time = 0
 print('start...')
 
 with open(f's3://{bucket_name}/{file_name}', 'rb', encoding='utf-8', transport_params={'client':client}) as fin:
-    header = fin.readline().rstrip().split(',')
-
-    row = None
-    while True:
-        if row == '':
-            break
+    data = csv.DictReader(fin)
     
-        data = []
+    start = time.time()
+    helpers.bulk(es, data, index=target_index)
+    end = time.time()
     
-        # Read 10000 rows and write
-        for _ in range(100000):
-            row = fin.readline().rstrip()
-        
-            if row == '':
-                break
-
-            data.append(dict(zip(header, row.split(','))))
-    
-        if data != []:
-            start = time.time()
-            helpers.bulk(es, data, index=target_index)
-            end = time.time()
-            total_time = total_time + (end - start)
+    total_time = total_time + (end - start)
 
 print('Complete, Time elapsed(s): ', total_time)

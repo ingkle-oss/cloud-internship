@@ -27,8 +27,8 @@ load_config(spark.sparkContext)
 
 df = spark.read \
     .format("delta") \
-    .load('s3a://delta/test')
-
+    .load('s3a://delta/test100k')
+    
 def f(row):
     pass
 
@@ -40,6 +40,3 @@ df.foreach(f)
 
 end = time.time()
 print('Read Complete, Time elapsed(s): ', end-start)
-
-# df.printSchema()
-# df.describe().show(vertical=True)

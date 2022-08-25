@@ -20,7 +20,7 @@ public class DeltaStandalone {
         conf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem");
         conf.set("fs.s3a.endpoint", endPoint);
         conf.set("fs.s3a.connection.ssl.enabled", "false");
-        DeltaLog log = DeltaLog.forTable(conf, "s3a://delta/test");
+        DeltaLog log = DeltaLog.forTable(conf, "s3a://delta/loadsavetest");
         CloseableIterator<RowRecord> dataIter = log.update().open();
         System.out.println("start...");
         Instant start = Instant.now();
