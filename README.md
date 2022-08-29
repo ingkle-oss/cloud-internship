@@ -19,7 +19,7 @@ Save a csv file having 50 fields and 1 million rows to Minio.
 &nbsp;
 ### Step 2
 Measure elapsed time and memory usage of writing data of the csv file with Delta-spark to Minio,
-and measure them with writing data to MongoDB and Elasticsearch.
+and also measure the time and memory of writing data to MongoDB and Elasticsearch.
 
 - There are 3 different method of writing.
   * Write every 10,000 rows
