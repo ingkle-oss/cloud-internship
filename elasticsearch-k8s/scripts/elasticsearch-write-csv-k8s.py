@@ -48,7 +48,7 @@ with open(f's3://{bucket_name}/{file_name}', 'rb', encoding='utf-8', transport_p
         data = []
     
         # Read 10000 rows and write
-        for _ in range(100000):
+        for _ in range(10000):
             row = fin.readline().rstrip()
         
             if row == '':
