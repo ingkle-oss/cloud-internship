@@ -15,7 +15,7 @@
   - pyspark version: 3.2.1
 * Mongodb
   - Version: 5.0.7-6
-  - Memory:
+  - Memory: unlimited
   - cfg: 3
   - Replicaset: 3
   - mongos: 2
@@ -216,4 +216,18 @@ In case of reading delta table, performance of delta-standalone was also tested.
 
 ## Conclusion
 
-...
+1. Write
+   - delta-spark는 batch size가 클수록, executor 수가 많을수록 소요시간이 짧아지는 경향이 있다.
+   - mongodb는 batch size가 작을 경우 속도가 빠르지만, batch size가 커지면 delta-spark에 역전될 수 있다.
+   - elasticsearch는 write 속도가 매우 느리다
+
+2. Read
+   - delta-spark의 경우, batch size와 executor instance에 따른 소요시간의 경향성이 보이지 않는다. Workload에 따라 batch size와 executor instance를 조율하는 것이 필요하다. 
+   - delta-standalone이 delta-spark보다 항상 빠른 것은 아니다.
+   - elasticsearch는 write 속도가 매우 느렸지만, mongodb의 read 속도보다 약 2배 빠른 read 속도를 보인다.
+
+3. Memory
+   - delta-spark는 executor instance가 클수록 메모리를 많이 사용한다.
+   - mongodb는 write의 batch size가 클수록 메모리 사용량이 증가한다.
+   - elasticsearch는 메모리 사용량이 가장 적다.
+   - 모든 데이터를 한 번에 쓰는 경우(batch size=1,000,000 : number of writing=1), 코드 구현이 Iterator 또는 cursor를 이용해서 csv를 읽는 동시에 write 하기 때문에 메모리 사용량이 적다.
