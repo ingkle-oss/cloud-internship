@@ -13,6 +13,10 @@
 * Delta-Spark
   - delta-spark version: 1.2.0
   - pyspark version: 3.2.1
+  - SPARK_DRIVER_MEMORY: 2g
+  - SPARK_EXECUTOR_INSTANCES: 1, 2, 4
+  - SPARK_EXECUTOR_CORES: 1
+  - SPARK_EXECUTOR_MEMORY: 4g
 * Mongodb
   - Version: 5.0.7-6
   - Memory: unlimited
