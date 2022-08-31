@@ -13,10 +13,10 @@
 * Delta-Spark
   - delta-spark version: 1.2.0
   - pyspark version: 3.2.1
-  - SPARK_DRIVER_MEMORY: 2g
-  - SPARK_EXECUTOR_INSTANCES: 1, 2, 4
-  - SPARK_EXECUTOR_CORES: 1
-  - SPARK_EXECUTOR_MEMORY: 4g
+  - spark.driver.memory: 2g
+  - spark.executor.instance: 1, 2, 4
+  - spark.executor.cores: 1
+  - spark.executor.memory: 4g
 * Mongodb
   - Version: 5.0.7-6
   - Memory: unlimited
@@ -55,28 +55,14 @@ and also measure the time and memory of writing data to MongoDB and Elasticsearc
 
    1. Write every 10,000 rows or 100,000 rows
    ```
-   from pyspark.sql import SparkSession
-   from pyspark.context import SparkContext
-   import pandas as pd
-   from smart_open import open
-   from delta import *
-   import boto3
-   
-   ... 
-   
-   data = dict(zip(header, list(zip(*rows))))
-   df = spark.createDataFrame(pd.DataFrame(data))
+   ...
+   df = spark.createDataFrame(pd.DataFrame(data))  # pd=pandas, data=dict saving 10,000 rows
    df.write.format('delta').mode('append').save('s3a://delta/test/')
    ```
    
    2. Write all at once
    ```
-   from pyspark.sql import SparkSession
-   from pyspark.context import SparkContext
-   from delta import *
-   
    ...
-   
    df = spark.read.options(header=True, inferSchema=True).format("csv").load('s3a://test/test.csv')
    df.write.format('delta').mode("overwrite").option("overwriteSchema", "True").save('s3a://delta/loadsavetest/')
    ```
@@ -85,57 +71,37 @@ and also measure the time and memory of writing data to MongoDB and Elasticsearc
 
    1. Write every 10,000 rows or 100,000 rows
    ```
-   from pymongo import MongoClient
-   from smart_open import open
-   
    ...
-   
-   data = []
-   # Read 10,000 rows and write
    for _ in range(10000):
-       row = fin.readline().rstrip()
-       if row == '':
-           break
-       data.append(dict(zip(header, row.split(','))))
-       
+       ##########################################
+       # read 10,000 rows and save them to data #
+       ##########################################
    collection.insert_many(data)
    ```
    
    2. Write all at once
    ```
-   from pymongo import MongoClient
    from smart_open import open
-   
    ...
-   
-   data = csv.DictReader(fin)
+   data = csv.DictReader(fin)   # fin is a file-like object
    collection.insert_many(data)
    ```
    
   * elasticsearch
    1. Write every 10,000 rows or 100,000 rows
    ```
-   from elasticsearch import helpers, Elasticsearch
-   from smart_open import open
-   
    ...
-   data = []
-   # Read 10000 rows and write
    for _ in range(10000):
-       row = fin.readline().rstrip()  
-       if row == '':
-           break
-       data.append(dict(zip(header, row.split(','))))
+       ##########################################
+       # read 10,000 rows and save them to data #
+       ##########################################
    helpers.bulk(es, data, index=target_index)
    ```
    2. Write all at once
    ```
-   from elasticsearch import helpers, Elasticsearch
    from smart_open import open
-   
-   ...
-   
-   data = csv.DictReader(fin)
+   ...   
+   data = csv.DictReader(fin)   # fin is a file-like object
    helpers.bulk(es, data, index=target_index)
    ```
 
@@ -152,16 +118,9 @@ In case of reading delta table, performance of delta-standalone was also tested.
 - Library and Functions
   * delta-spark
    ```
-   from pyspark.sql import SparkSession
-   from pyspark.context import SparkContext
-   from delta import *
-   
-   ...
-   
+   ...   
    df = spark.read.format("delta").load('s3a://delta/test')
-   def f(row):
-       pass
-   df.foreach(f) # reading data one by one
+   df.foreach(f) # reading data one by one, f is a function doing nothing
    ```
    
   * delta-standalone (Java)
@@ -169,36 +128,25 @@ In case of reading delta table, performance of delta-standalone was also tested.
    import io.delta.standalone.DeltaLog;
    import io.delta.standalone.data.CloseableIterator;
    import io.delta.standalone.data.RowRecord;
-   
    ...
-   
-   // reading data one by one
-   while(dataIter.hasNext()) { RowRecord temp = (RowRecord)dataIter.next(); }
+   while(dataIter.hasNext()) { RowRecord temp = (RowRecord)dataIter.next(); }   // reading data one by one
    ```
    
   * mongodb
    ```
-   from pymongo import MongoClient
-   
    ...
-   
    cursor = collection.find()
-   for doc in cursor: # reading data one by one
+   for doc in cursor:   # reading data one by one
        pass
    ```
    
   * elasticsearch
    ```
-   from elasticsearch import Elasticsearch
-   
-   ...
-   
+   ...  
    while True:
         # reading 10,000 data repeatedly
         resp = es.search(size=10000, query=my_query, pit=pit_clause, sort=sort_clause, search_after=search_after_clause)
-    
-        if resp['hits']['hits'] == []:
-            break
+        ...
    ```
 
 &nbsp;
